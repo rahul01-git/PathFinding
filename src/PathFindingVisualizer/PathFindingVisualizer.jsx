@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./PathFindingVisualizer.css";
 import Node from "./Node/Node";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
@@ -10,6 +10,7 @@ const FINISH_NODE_COL = 35;
 
 export default function PathFindingVisualizer() {
   const [grids, setGrids] = useState([]);
+  const nodeRef = useRef([]);
   useEffect(() => {
     setGrids(getInitialGrid);
   }, []);
@@ -18,7 +19,35 @@ export default function PathFindingVisualizer() {
     const startNode = grids[START_NODE_ROW][START_NODE_COL];
     const finishNode = grids[FINISH_NODE_ROW][FINISH_NODE_COL];
     const visitedNodesInOrder = dijkstra(grids, startNode, finishNode);
-    console.log(getNodesInShortestPathOrder(finishNode));
+    const nodeInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
+    animateDijkstra(visitedNodesInOrder, nodeInShortestPathOrder);
+  };
+
+  const animateDijkstra = (visitedNodesInOrder, nodeInShortestPathOrder) => {
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      if (i === visitedNodesInOrder.length) {
+        setTimeout(() => {
+          animateShortestPath(nodeInShortestPathOrder);
+        }, 10 * i);
+      } else {
+        setTimeout(() => {
+          const node = visitedNodesInOrder[i];
+          console.log(node);
+          const { row, col } = node;
+          nodeRef.current[row][col].classList.add("node-visited");
+        }, 10 * i);
+      }
+    }
+  };
+
+  const animateShortestPath = (nodeInShortestPathOrder) => {
+    for (let i = 0; i < nodeInShortestPathOrder.length; i++) {
+      setTimeout(() => {
+        const node = nodeInShortestPathOrder[i];
+        const { row, col } = node;
+        nodeRef.current[row][col].classList.add("shortest-path");
+      }, 50 * i);
+    }
   };
 
   return (
@@ -37,6 +66,10 @@ export default function PathFindingVisualizer() {
                 key={nodeIdx}
                 isStart={node.isStart}
                 isFinish={node.isFinish}
+                ref={(ref) => {
+                  nodeRef.current[node.row] = nodeRef.current[node.row] || [];
+                  nodeRef.current[node.row][node.col] = ref;
+                }}
               />
             ))}
           </div>
