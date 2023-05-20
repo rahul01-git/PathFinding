@@ -1,14 +1,33 @@
 import React, { useEffect, useState } from "react";
 import "./PathFindingVisualizer.css";
 import Node from "./Node/Node";
+import { dijkstra } from "../algorithms/dijkstra";
+
+const START_NODE_ROW = 10;
+const START_NODE_COL = 15;
+const FINISH_NODE_ROW = 10;
+const FINISH_NODE_COL = 35;
+
 export default function PathFindingVisualizer() {
   const [grids, setGrids] = useState([]);
   useEffect(() => {
     setGrids(getInitialGrid);
   }, []);
 
+  const visualizeDijkstra = () => {
+    const startNode = grids[START_NODE_ROW][START_NODE_COL];
+    const finishNode = grids[FINISH_NODE_ROW][FINISH_NODE_COL];
+    console.log(dijkstra(grids, startNode, finishNode));
+  };
+
   return (
     <>
+      <button
+        onClick={() => visualizeDijkstra()}
+        className="text-white bg-sky-400 py-2 px-4 m-4 rounded"
+      >
+        Visualize
+      </button>
       {grids.map((row, rowIdx) => {
         return (
           <div key={rowIdx}>
@@ -42,7 +61,11 @@ const createNode = (col, row) => {
   return {
     col,
     row,
-    isStart: row === 10 && col === 5,
-    isFinish: row === 8 && col === 19,
+    isStart: row === START_NODE_ROW && col === START_NODE_COL,
+    isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
+    distance: Infinity,
+    isVisited: false,
+    isWall: false,
+    previousNode: null,
   };
 };
