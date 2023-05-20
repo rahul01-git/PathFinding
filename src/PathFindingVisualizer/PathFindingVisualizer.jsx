@@ -11,9 +11,13 @@ export default function PathFindingVisualizer() {
     <>
       {grids.map((row, rowIdx) => {
         return (
-          <div>
+          <div key={rowIdx}>
             {row.map((node, nodeIdx) => (
-              <Node />
+              <Node
+                key={nodeIdx}
+                isStart={node.isStart}
+                isFinish={node.isFinish}
+              />
             ))}
           </div>
         );

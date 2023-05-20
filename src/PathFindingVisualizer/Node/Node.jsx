@@ -1,6 +1,10 @@
 import "./node.css";
-export default function Node() {
+export default function Node({ isStart, isFinish }) {
+  const extraClass = isFinish ? "bg-red-500" : isStart ? "bg-green-500" : "";
+
   return (
-    <div className="w-5 h-5 border-2 border-gray-400 inline-block cursor-pointer"></div>
+    <div
+      className={`w-5 h-5 border-2 border-gray-200 inline-block cursor-pointer ${extraClass}`}
+    ></div>
   );
 }
