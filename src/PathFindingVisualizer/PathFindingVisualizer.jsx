@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./PathFindingVisualizer.css";
 import Node from "./Node/Node";
-import { dijkstra } from "../algorithms/dijkstra";
+import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
 
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 10;
+const FINISH_NODE_ROW = 12;
 const FINISH_NODE_COL = 35;
 
 export default function PathFindingVisualizer() {
@@ -17,7 +17,8 @@ export default function PathFindingVisualizer() {
   const visualizeDijkstra = () => {
     const startNode = grids[START_NODE_ROW][START_NODE_COL];
     const finishNode = grids[FINISH_NODE_ROW][FINISH_NODE_COL];
-    console.log(dijkstra(grids, startNode, finishNode));
+    const visitedNodesInOrder = dijkstra(grids, startNode, finishNode);
+    console.log(getNodesInShortestPathOrder(finishNode));
   };
 
   return (
