@@ -13,6 +13,8 @@ export default function PathFindingVisualizer({
   setMouseIsPressed,
 }) {
   const [grids, setGrids] = useState([]);
+  const [visitedNodesInOrder, setVisitedNodesInOrder] = useState([]);
+  const [nodeInShortestPathOrder, setNodeInShortestPathOrder] = useState([]);
 
   const nodeRef = useRef([]);
   useEffect(() => {
@@ -38,10 +40,14 @@ export default function PathFindingVisualizer({
   const visualizeDijkstra = () => {
     const startNode = grids[START_NODE_ROW][START_NODE_COL];
     const finishNode = grids[FINISH_NODE_ROW][FINISH_NODE_COL];
-    const visitedNodesInOrder = dijkstra(grids, startNode, finishNode);
-    const nodeInShortestPathOrder = getNodesInShortestPathOrder(finishNode);
-    animateDijkstra(visitedNodesInOrder, nodeInShortestPathOrder);
+    setVisitedNodesInOrder(dijkstra(grids, startNode, finishNode));
+    setNodeInShortestPathOrder(getNodesInShortestPathOrder(finishNode));
   };
+  useEffect(() => {
+    if (visitedNodesInOrder.length > 0 && nodeInShortestPathOrder.length > 0) {
+      animateDijkstra(visitedNodesInOrder, nodeInShortestPathOrder);
+    }
+  }, [visitedNodesInOrder, nodeInShortestPathOrder]);
 
   const animateDijkstra = (visitedNodesInOrder, nodeInShortestPathOrder) => {
     for (let i = 0; i <= visitedNodesInOrder.length; i++) {
@@ -69,9 +75,26 @@ export default function PathFindingVisualizer({
     }
   };
 
+  const clearBoard = () => {
+    setGrids(getInitialGrid());
+
+    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+      for (let i = 0; i < nodeInShortestPathOrder.length; i++) {
+        const node = nodeInShortestPathOrder[i];
+        const { row, col } = node;
+        nodeRef.current[row][col].classList.remove("shortest-path");
+      }
+      const node = visitedNodesInOrder[i];
+      const { row, col } = node;
+      nodeRef.current[row][col].classList.remove("node-visited");
+    }
+    setVisitedNodesInOrder([]);
+    setNodeInShortestPathOrder([]);
+  };
+
   return (
     <>
-      <Header visualizeDijkstra={visualizeDijkstra}/>
+      <Header visualizeDijkstra={visualizeDijkstra} clearBoard={clearBoard} />
       {grids.map((row, rowIdx) => {
         return (
           <div key={rowIdx} className="flex flex-row justify-center">
