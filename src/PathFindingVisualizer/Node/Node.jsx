@@ -1,8 +1,10 @@
 import { forwardRef } from "react";
+import { VscDebugStart } from 'react-icons/vsc';
+import { FaBullseye } from 'react-icons/fa';
 import "./node.css";
 
 const Node = forwardRef(({ isStart, isFinish, isWall,onMouseDown,onMouseEnter,onMouseUp,row,col }, ref) => {
-  const extraClass = isFinish ? "bg-red-500" : isStart ? "bg-green-500" : isWall? "node-wall" : "";
+  const extraClass = isFinish ? "text-red-500" : isStart ? "text-green-500" : isWall? "node-wall" : "";
 
   return (
     <div
@@ -11,8 +13,8 @@ const Node = forwardRef(({ isStart, isFinish, isWall,onMouseDown,onMouseEnter,on
       onMouseDown={()=>onMouseDown(row,col)}
       onMouseEnter={()=>onMouseEnter(row,col)}
       onMouseUp={() => onMouseUp()}
-    ></div>
+    >{isStart? <VscDebugStart/> : isFinish?<FaBullseye/> : '' }</div>
   );
 });
-
+Node.displayName = 'Node';
 export default Node;
