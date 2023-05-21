@@ -2,38 +2,38 @@ import { useEffect, useRef, useState } from "react";
 import "./PathFindingVisualizer.css";
 import Node from "./Node/Node";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
-
+import Header from "../components/Header";
 const START_NODE_ROW = 10;
 const START_NODE_COL = 15;
 const FINISH_NODE_ROW = 12;
 const FINISH_NODE_COL = 35;
 
-export default function PathFindingVisualizer({mouseIsPressed,setMouseIsPressed}) {
+export default function PathFindingVisualizer({
+  mouseIsPressed,
+  setMouseIsPressed,
+}) {
   const [grids, setGrids] = useState([]);
- 
+
   const nodeRef = useRef([]);
   useEffect(() => {
     setGrids(getInitialGrid);
   }, []);
 
-  const handleMouseDown = (row,col) =>{
-    const newGrid = getNewGridWithWallToggled(grids,row,col)
+  const handleMouseDown = (row, col) => {
+    const newGrid = getNewGridWithWallToggled(grids, row, col);
     setGrids(newGrid);
     setMouseIsPressed(true);
-  }
+  };
 
-  const handleMouseEnter = (row,col) => {
-    if(!mouseIsPressed) return;
-    const newGrid = getNewGridWithWallToggled(grids,row,col);
+  const handleMouseEnter = (row, col) => {
+    if (!mouseIsPressed) return;
+    const newGrid = getNewGridWithWallToggled(grids, row, col);
     setGrids(newGrid);
+  };
 
-  }
-
-  const handleMouseUp = () =>{
+  const handleMouseUp = () => {
     setMouseIsPressed(false);
-  }
-
- 
+  };
 
   const visualizeDijkstra = () => {
     const startNode = grids[START_NODE_ROW][START_NODE_COL];
@@ -71,15 +71,10 @@ export default function PathFindingVisualizer({mouseIsPressed,setMouseIsPressed}
 
   return (
     <>
-      <button
-        onClick={() => visualizeDijkstra()}
-        className="text-white bg-sky-400 py-2 px-4 m-4 rounded"
-      >
-        Visualize
-      </button>
+      <Header visualizeDijkstra={visualizeDijkstra}/>
       {grids.map((row, rowIdx) => {
         return (
-          <div key={rowIdx}>
+          <div key={rowIdx} className="flex flex-row justify-center">
             {row.map((node, nodeIdx) => (
               <Node
                 key={nodeIdx}
@@ -89,9 +84,9 @@ export default function PathFindingVisualizer({mouseIsPressed,setMouseIsPressed}
                 col={node.col}
                 mouseIsPressed={mouseIsPressed}
                 isWall={node.isWall}
-                onMouseDown={(row,col)=>handleMouseDown(row,col)}
-                onMouseEnter={(row,col)=>handleMouseEnter(row,col)}
-                onMouseUp={()=>handleMouseUp()}
+                onMouseDown={(row, col) => handleMouseDown(row, col)}
+                onMouseEnter={(row, col) => handleMouseEnter(row, col)}
+                onMouseUp={() => handleMouseUp()}
                 ref={(ref) => {
                   nodeRef.current[node.row] = nodeRef.current[node.row] || [];
                   nodeRef.current[node.row][node.col] = ref;
@@ -130,14 +125,13 @@ const createNode = (col, row) => {
   };
 };
 
-
-const getNewGridWithWallToggled = (grid,row,col) =>{
+const getNewGridWithWallToggled = (grid, row, col) => {
   const newGrid = grid.slice();
   const node = newGrid[row][col];
   const newNode = {
     ...node,
     isWall: !node.isWall,
-  }
+  };
   newGrid[row][col] = newNode;
   return newGrid;
-}
+};
