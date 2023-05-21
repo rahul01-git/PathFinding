@@ -3,28 +3,42 @@ import "./PathFindingVisualizer.css";
 import Node from "./Node/Node";
 import { dijkstra, getNodesInShortestPathOrder } from "../algorithms/dijkstra";
 import Header from "../components/Header";
-const START_NODE_ROW = 10;
-const START_NODE_COL = 15;
-const FINISH_NODE_ROW = 12;
-const FINISH_NODE_COL = 35;
 
 export default function PathFindingVisualizer({
   mouseIsPressed,
   setMouseIsPressed,
 }) {
+  const nodeRef = useRef([]);
   const [grids, setGrids] = useState([]);
   const [visitedNodesInOrder, setVisitedNodesInOrder] = useState([]);
   const [nodeInShortestPathOrder, setNodeInShortestPathOrder] = useState([]);
 
-  const nodeRef = useRef([]);
+  const [START_NODE_ROW, setSTART_NODE_ROW] = useState(-1);
+  const [START_NODE_COL, setSTART_NODE_COL] = useState(-1);
+  const [FINISH_NODE_ROW, setFINISH_NODE_ROW] = useState(-1);
+  const [FINISH_NODE_COL, setFINISH_NODE_COL] = useState(-1);
+
+  const [startClicked, setStartClicked] = useState(false);
+  const [finishClicked, setFinishClicked] = useState(false);
+
   useEffect(() => {
     setGrids(getInitialGrid);
-  }, []);
+  }, [startClicked, finishClicked]);
 
   const handleMouseDown = (row, col) => {
-    const newGrid = getNewGridWithWallToggled(grids, row, col);
-    setGrids(newGrid);
-    setMouseIsPressed(true);
+    if (startClicked) {
+      setSTART_NODE_ROW(row);
+      setSTART_NODE_COL(col);
+      setStartClicked(false);
+    } else if (finishClicked) {
+      setFINISH_NODE_ROW(row);
+      setFINISH_NODE_COL(col);
+      setFinishClicked(false);
+    } else{
+      const newGrid = getNewGridWithWallToggled(grids, row, col);
+      setGrids(newGrid);
+      setMouseIsPressed(true);
+    }
   };
 
   const handleMouseEnter = (row, col) => {
@@ -78,7 +92,7 @@ export default function PathFindingVisualizer({
   const clearBoard = () => {
     setGrids(getInitialGrid());
 
-    for (let i = 0; i <= visitedNodesInOrder.length; i++) {
+    for (let i = 0; i < visitedNodesInOrder.length; i++) {
       for (let i = 0; i < nodeInShortestPathOrder.length; i++) {
         const node = nodeInShortestPathOrder[i];
         const { row, col } = node;
@@ -92,9 +106,52 @@ export default function PathFindingVisualizer({
     setNodeInShortestPathOrder([]);
   };
 
+  const getInitialGrid = () => {
+    const grid = [];
+    for (let row = 0; row < 20; row++) {
+      const currentRow = [];
+      for (let col = 0; col < 50; col++) {
+        currentRow.push(createNode(col, row));
+      }
+      grid.push(currentRow);
+    }
+    return grid;
+  };
+
+  const createNode = (col, row) => {
+    return {
+      col,
+      row,
+      isStart: row === START_NODE_ROW && col === START_NODE_COL,
+      isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
+      distance: Infinity,
+      isVisited: false,
+      isWall: false,
+      previousNode: null,
+    };
+  };
+
+  const getNewGridWithWallToggled = (grid, row, col) => {
+    const newGrid = grid.slice();
+    const node = newGrid[row][col];
+    const newNode = {
+      ...node,
+      isWall: !node.isWall,
+    };
+    newGrid[row][col] = newNode;
+    return newGrid;
+  };
+
   return (
     <>
-      <Header visualizeDijkstra={visualizeDijkstra} clearBoard={clearBoard} />
+      <Header
+        visualizeDijkstra={visualizeDijkstra}
+        clearBoard={clearBoard}
+        setStartClicked={setStartClicked}
+        startClicked={startClicked}
+        finishClicked={finishClicked}
+        setFinishClicked={setFinishClicked}
+      />
       {grids.map((row, rowIdx) => {
         return (
           <div key={rowIdx} className="flex flex-row justify-center">
@@ -122,39 +179,3 @@ export default function PathFindingVisualizer({
     </>
   );
 }
-
-const getInitialGrid = () => {
-  const grid = [];
-  for (let row = 0; row < 20; row++) {
-    const currentRow = [];
-    for (let col = 0; col < 50; col++) {
-      currentRow.push(createNode(col, row));
-    }
-    grid.push(currentRow);
-  }
-  return grid;
-};
-
-const createNode = (col, row) => {
-  return {
-    col,
-    row,
-    isStart: row === START_NODE_ROW && col === START_NODE_COL,
-    isFinish: row === FINISH_NODE_ROW && col === FINISH_NODE_COL,
-    distance: Infinity,
-    isVisited: false,
-    isWall: false,
-    previousNode: null,
-  };
-};
-
-const getNewGridWithWallToggled = (grid, row, col) => {
-  const newGrid = grid.slice();
-  const node = newGrid[row][col];
-  const newNode = {
-    ...node,
-    isWall: !node.isWall,
-  };
-  newGrid[row][col] = newNode;
-  return newGrid;
-};
