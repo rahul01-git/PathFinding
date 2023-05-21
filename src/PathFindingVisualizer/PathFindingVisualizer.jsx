@@ -8,12 +8,32 @@ const START_NODE_COL = 15;
 const FINISH_NODE_ROW = 12;
 const FINISH_NODE_COL = 35;
 
-export default function PathFindingVisualizer() {
+export default function PathFindingVisualizer({mouseIsPressed,setMouseIsPressed}) {
   const [grids, setGrids] = useState([]);
+ 
   const nodeRef = useRef([]);
   useEffect(() => {
     setGrids(getInitialGrid);
   }, []);
+
+  const handleMouseDown = (row,col) =>{
+    const newGrid = getNewGridWithWallToggled(grids,row,col)
+    setGrids(newGrid);
+    setMouseIsPressed(true);
+  }
+
+  const handleMouseEnter = (row,col) => {
+    if(!mouseIsPressed) return;
+    const newGrid = getNewGridWithWallToggled(grids,row,col);
+    setGrids(newGrid);
+
+  }
+
+  const handleMouseUp = () =>{
+    setMouseIsPressed(false);
+  }
+
+ 
 
   const visualizeDijkstra = () => {
     const startNode = grids[START_NODE_ROW][START_NODE_COL];
@@ -32,7 +52,6 @@ export default function PathFindingVisualizer() {
       } else {
         setTimeout(() => {
           const node = visitedNodesInOrder[i];
-          console.log(node);
           const { row, col } = node;
           nodeRef.current[row][col].classList.add("node-visited");
         }, 10 * i);
@@ -66,6 +85,13 @@ export default function PathFindingVisualizer() {
                 key={nodeIdx}
                 isStart={node.isStart}
                 isFinish={node.isFinish}
+                row={node.row}
+                col={node.col}
+                mouseIsPressed={mouseIsPressed}
+                isWall={node.isWall}
+                onMouseDown={(row,col)=>handleMouseDown(row,col)}
+                onMouseEnter={(row,col)=>handleMouseEnter(row,col)}
+                onMouseUp={()=>handleMouseUp()}
                 ref={(ref) => {
                   nodeRef.current[node.row] = nodeRef.current[node.row] || [];
                   nodeRef.current[node.row][node.col] = ref;
@@ -103,3 +129,15 @@ const createNode = (col, row) => {
     previousNode: null,
   };
 };
+
+
+const getNewGridWithWallToggled = (grid,row,col) =>{
+  const newGrid = grid.slice();
+  const node = newGrid[row][col];
+  const newNode = {
+    ...node,
+    isWall: !node.isWall,
+  }
+  newGrid[row][col] = newNode;
+  return newGrid;
+}
