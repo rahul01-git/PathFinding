@@ -8,12 +8,12 @@ const Node = forwardRef(({ isStart, isFinish, isWall,onMouseDown,onMouseEnter,on
 
   return (
     <div
-      className={`w-5 h-5 border-2 border-gray-200 inline-block cursor-pointer ${extraClass}`}
+      className={`w-7 h-7 border-2 border-gray-200 inline-block cursor-pointer ${extraClass}`}
       ref={ref}
       onMouseDown={()=>onMouseDown(row,col)}
       onMouseEnter={()=>onMouseEnter(row,col)}
       onMouseUp={() => onMouseUp()}
-    >{isStart? <VscDebugStart/> : isFinish?<FaBullseye/> : '' }</div>
+    >{isStart? <VscDebugStart className="text-2xl"/> : isFinish?<FaBullseye className="text-2xl"/> : '' }</div>
   );
 });
 Node.displayName = 'Node';
